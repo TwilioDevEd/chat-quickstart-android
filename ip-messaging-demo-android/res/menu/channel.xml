@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.twilio.example.ChannelActivity" >
+
+ 	<item android:id="@+id/file"
+          android:title="@string/Options" >
+        <!-- "file" submenu -->
+        <menu>
+            <item
+                android:id="@+id/action_create_public"
+                android:icon="@drawable/ic_action_content_add"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/Create_public_channel"/>
+            <item
+                android:id="@+id/action_create_private"
+                android:icon="@drawable/ic_action_content_add"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/Create_private_channel"/>
+            <item
+                android:id="@+id/action_logout"
+                android:icon="@drawable/ic_action_settings"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/logout"/>
+            </menu>
+    </item>
+
+</menu>
