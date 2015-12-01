@@ -1,5 +1,5 @@
 
-# IP Messaging Quickstart for Android (Java)
+# IP Messaging Starter Application for Android 
 
 This application should give you a ready-made starting point for writing your
 own messaging apps with Twilio IP Messaging. Before we begin, we need to collect
@@ -41,7 +41,7 @@ Your new service SID will be prefixed with an `IS` in the JSON data you get back
 ## Setting Up The Android App
 
 Just run the 'LoginActivity' and you're good to go! The app will generate a username and autoconnect to the 'general' channel
-# IP Messaging Starter Application for Android
+
 ## License
 
 MIT
