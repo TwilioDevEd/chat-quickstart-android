@@ -45,7 +45,6 @@ public class LoginActivity extends Activity implements LoginListener {
 		this.clientNameTextBox.setText(DEFAULT_CLIENT_NAME);
 		this.endpoint_id = Secure.getString(this.getApplicationContext().getContentResolver(), Secure.ANDROID_ID);
 
-
 				String idChosen = clientNameTextBox.getText().toString();
 				String endpointIdFull = idChosen + "-" + LoginActivity.this.endpoint_id + "-android-"+ getApplication().getPackageName();
 

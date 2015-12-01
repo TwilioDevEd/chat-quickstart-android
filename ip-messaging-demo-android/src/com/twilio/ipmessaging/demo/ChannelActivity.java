@@ -45,7 +45,6 @@ public class ChannelActivity extends Activity implements ChannelListener {
 	private static final String[] CHANNEL_OPTIONS = { "Join" };
 	private static final Logger logger = Logger.getLogger(ChannelActivity.class);
 	private static final int JOIN = 0;
-	//private static final int DESTROY = 1;
 
 	private ListView listView;
 	private BasicIPMessagingClient basicClient;
