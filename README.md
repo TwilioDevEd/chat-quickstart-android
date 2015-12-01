@@ -1,3 +1,4 @@
+
 # IP Messaging Quickstart for Android (Java)
 
 This application should give you a ready-made starting point for writing your
@@ -40,7 +41,7 @@ Your new service SID will be prefixed with an `IS` in the JSON data you get back
 ## Setting Up The Android App
 
 Just run the 'LoginActivity' and you're good to go! The app will generate a username and autoconnect to the 'general' channel
-
+# IP Messaging Starter Application for Android
 ## License
 
 MIT
