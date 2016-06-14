@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">IPMessagingQuickstart</string>
+    <string name="error_retrieving_access_token">Error retrieving access token from the server.</string>
+    <string name="send">Send</string>
+</resources>
