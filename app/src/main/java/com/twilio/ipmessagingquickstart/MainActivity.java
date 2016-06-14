@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
        https://www.twilio.com/docs/api/ip-messaging/guides/quickstart-js
     */
-    final static String SERVER_TOKEN_URL = "http://85714dd2.ngrok.io/token";
+    final static String SERVER_TOKEN_URL = "http://localhost:8000/token.php";
 
-    final static String DEFAULT_CHANNEL_NAME = "android14";
+    final static String DEFAULT_CHANNEL_NAME = "general";
     final static String TAG = "TwilioIPMessaging";
 
     private RecyclerView mMessagesRecyclerView;
