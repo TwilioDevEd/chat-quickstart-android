@@ -1,4 +1,4 @@
-package com.twilio.ipmessagingquickstart;
+package com.twilio.chatquickstart;
 
 import org.junit.Test;
 

@@ -1,25 +1,25 @@
-# IP Messaging Android Quickstart
+# Chat Android Quickstart
 
 In this guide, we will get you up and running quickly with a sample application
-you can build on as you learn more about IP Messaging. Sound like a plan? Then
+you can build on as you learn more about Chat. Sound like a plan? Then
 let's get cracking!
 
 ## Gather Account Information
 
 The first thing we need to do is grab all the necessary configuration values from our
-Twilio account. To set up our back-end for IP messaging, we will need four 
+Twilio account. To set up our back-end for Chat, we will need four 
 pieces of information:
 
 | Config Value  | Description |
 | :-------------  |:------------- |
-Service Instance SID | Like a database for your IP Messaging data - [generate one in the console here](https://www.twilio.com/user/account/ip-messaging/services)
+Service Instance SID | Like a database for your Chat data - [generate one in the console here](https://www.twilio.com/user/account/ip-messaging/services)
 Account SID | Your primary Twilio account identifier - find this [in the console here](https://www.twilio.com/user/account/ip-messaging/getting-started).
 API Key | Used to authenticate - [generate one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys).
 API Secret | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys).
 
 ## Set Up The Server App
 
-An IP Messaging application has two pieces - a client (our Android app) and a server.
+An Chat application has two pieces - a client (our Android app) and a server.
 You can learn more about what the server app does [by going through this guide](https://www.twilio.com/docs/api/ip-messaging/guides/identity).
 For now, let's just get a simple server running so we can use it to power our
 Android application.
@@ -75,7 +75,7 @@ URL.
 
 ## Configure and Run the Mobile App
 
-At the time of writing, the Twilio IP Messaging library does not run in x86-64 emulators.
+At the time of writing, the Twilio Chat library does not run in x86-64 emulators.
 You may need to run the Android app on your own phone or tablet. If that's the case, you
 will need to make sure the chat server is externally accessible, using ngrok or running it on a server.
 
