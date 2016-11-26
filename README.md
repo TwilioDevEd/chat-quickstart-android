@@ -1,26 +1,26 @@
-# IP Messaging Android Quickstart
+# Chat Android Quickstart
 
 In this guide, we will get you up and running quickly with a sample application
-you can build on as you learn more about IP Messaging. Sound like a plan? Then
+you can build on as you learn more about Chat. Sound like a plan? Then
 let's get cracking!
 
 ## Gather Account Information
 
 The first thing we need to do is grab all the necessary configuration values from our
-Twilio account. To set up our back-end for IP messaging, we will need four 
+Twilio account. To set up our back-end for Chat, we will need four 
 pieces of information:
 
 | Config Value  | Description |
 | :-------------  |:------------- |
-Service Instance SID | Like a database for your IP Messaging data - [generate one in the console here](https://www.twilio.com/user/account/ip-messaging/services)
-Account SID | Your primary Twilio account identifier - find this [in the console here](https://www.twilio.com/user/account/ip-messaging/getting-started).
-API Key | Used to authenticate - [generate one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys).
-API Secret | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys).
+Service Instance SID | Like a database for your Chat data - [generate one in the console here](https://www.twilio.com/console/chat/services)
+Account SID | Your primary Twilio account identifier - find this [in the console here](https://www.twilio.com/console/chat/getting-started).
+API Key | Used to authenticate - [generate one here](https://www.twilio.com/console/chat/dev-tools/api-keys).
+API Secret | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/chat/dev-tools/api-keys).
 
 ## Set Up The Server App
 
-An IP Messaging application has two pieces - a client (our Android app) and a server.
-You can learn more about what the server app does [by going through this guide](https://www.twilio.com/docs/api/ip-messaging/guides/identity).
+An Chat application has two pieces - a client (our Android app) and a server.
+You can learn more about what the server app does [by going through this guide](https://www.twilio.com/docs/api/chat/guides/identity).
 For now, let's just get a simple server running so we can use it to power our
 Android application.
 
@@ -29,7 +29,7 @@ Android application.
 </a>
 
 If you prefer, there are backend apps available for 
-[other server-side languages](https://www.twilio.com/docs/api/ip-messaging/guides/quickstart-js).
+[other server-side languages](https://www.twilio.com/docs/api/chat/guides/quickstart-js).
 
 Unzip the app you just downloaded, and navigate to that folder in a Terminal window on
 your Mac. Your Mac should already have PHP installed, we just need to configure
@@ -75,22 +75,22 @@ URL.
 
 ## Configure and Run the Mobile App
 
-At the time of writing, the Twilio IP Messaging library does not run in x86-64 emulators.
+At the time of writing, the Twilio Chat library does not run in x86-64 emulators.
 You may need to run the Android app on your own phone or tablet. If that's the case, you
 will need to make sure the chat server is externally accessible, using ngrok or running it on a server.
 
-Once the app loads in the simulator, you should see a UI like this one:
+Once the app loads, you should see a UI like this one:
 
-![quick start app screenshot](http://i.imgur.com/oFMinfF.png)
+![quick start app screenshot](http://i.imgur.com/WgKdQcr.png)
 
 Start sending yourself a few messages - they should start appearing both in a
 `RecyclerView` in the starter app, and in your browser as well if you kept that
 window open.
 
 You're all set! From here, you can start building your own application. For guidance
-on integrating the Android SDK into your existing project, [head over to our install guide](https://www.twilio.com/docs/api/ip-messaging/sdks).
-If you'd like to learn more about how IP Messaging works, you might want to dive
-into our [user identity guide](https://www.twilio.com/docs/api/ip-messaging/guides/identity), 
+on integrating the Android SDK into your existing project, [head over to our install guide](https://www.twilio.com/docs/api/chat/sdks).
+If you'd like to learn more about how Chat works, you might want to dive
+into our [user identity guide](https://www.twilio.com/docs/api/chat/guides/identity), 
 which talks about the relationship between the mobile app and the server.
 
 Good luck and have fun!
