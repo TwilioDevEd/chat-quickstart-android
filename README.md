@@ -79,9 +79,9 @@ At the time of writing, the Twilio Chat library does not run in x86-64 emulators
 You may need to run the Android app on your own phone or tablet. If that's the case, you
 will need to make sure the chat server is externally accessible, using ngrok or running it on a server.
 
-Once the app loads in the simulator, you should see a UI like this one:
+Once the app loads, you should see a UI like this one:
 
-![quick start app screenshot](http://i.imgur.com/oFMinfF.png)
+![quick start app screenshot](http://i.imgur.com/WgKdQcr.png)
 
 Start sending yourself a few messages - they should start appearing both in a
 `RecyclerView` in the starter app, and in your browser as well if you kept that
