@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onError(ErrorInfo errorInfo) {
-                            Log.e(TAG,"Error sending message: " + errorInfo.getErrorText());
+                            Log.e(TAG,"Error sending message: " + errorInfo.getMessage());
                         }
                     });
                 }
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onError(ErrorInfo errorInfo) {
-                                    Log.e(TAG,"Error creating channel: " + errorInfo.getErrorText());
+                                    Log.e(TAG,"Error creating channel: " + errorInfo.getMessage());
                                 }
                             });
                 }
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG,"Error retrieving channel: " + errorInfo.getErrorText());
+                Log.e(TAG,"Error retrieving channel: " + errorInfo.getMessage());
             }
 
         });
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG,"Error joining channel: " + errorInfo.getErrorText());
+                Log.e(TAG,"Error joining channel: " + errorInfo.getMessage());
             }
         });
     }
@@ -197,13 +197,15 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(ErrorInfo errorInfo) {
-                    Log.e(TAG,"Error creating Twilio Chat Client: " + errorInfo.getErrorText());
+                    Log.e(TAG,"Error creating Twilio Chat Client: " + errorInfo.getMessage());
                 }
             };
 
     private ChannelListener mDefaultChannelListener = new ChannelListener() {
+
+
         @Override
-        public void onMessageAdd(final Message message) {
+        public void onMessageAdded(final Message message) {
             Log.d(TAG, "Message added");
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
@@ -217,42 +219,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onMessageChange(Message message) {
-            Log.d(TAG, "Message changed: " + message.getMessageBody());
+        public void onMessageUpdated(Message message) {
+            Log.d(TAG, "Message updated: " + message.getMessageBody());
         }
 
         @Override
-        public void onMessageDelete(Message message) {
+        public void onMessageDeleted(Message message) {
             Log.d(TAG, "Message deleted");
         }
 
         @Override
-        public void onMemberJoin(Member member) {
-            Log.d(TAG, "Member joined: " + member.getUserInfo().getIdentity());
+        public void onMemberAdded(Member member) {
+            Log.d(TAG, "Member added: " + member.getIdentity());
         }
 
         @Override
-        public void onMemberChange(Member member) {
-            Log.d(TAG, "Member changed: " + member.getUserInfo().getIdentity());
+        public void onMemberUpdated(Member member) {
+            Log.d(TAG, "Member updated: " + member.getIdentity());
         }
 
         @Override
-        public void onMemberDelete(Member member) {
-            Log.d(TAG, "Member deleted: " + member.getUserInfo().getIdentity());
+        public void onMemberDeleted(Member member) {
+            Log.d(TAG, "Member deleted: " + member.getIdentity());
         }
 
         @Override
         public void onTypingStarted(Member member) {
-            Log.d(TAG, "Started Typing: " + member.getUserInfo().getIdentity());
+            Log.d(TAG, "Started Typing: " + member.getIdentity());
         }
 
         @Override
         public void onTypingEnded(Member member) {
-            Log.d(TAG, "Ended Typing: " + member.getUserInfo().getIdentity());
+            Log.d(TAG, "Ended Typing: " + member.getIdentity());
         }
 
         @Override
-        public void onSynchronizationChange(Channel channel) {
+        public void onSynchronizationChanged(Channel channel) {
 
         }
     };
