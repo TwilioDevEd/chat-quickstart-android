@@ -31,16 +31,15 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     /*
-       Change this URL to match the token URL for your quick start server
-
-       Download the quick start server from:
-
-       https://www.twilio.com/docs/api/ip-messaging/guides/quickstart-js
+       Change this URL to match the token URL for your Twilio Function
     */
-    final static String SERVER_TOKEN_URL = "http://localhost:8000/token.php";
+    final static String SERVER_TOKEN_URL = "https://YOUR_DOMAIN_HERE.twil.io/chat-token";
 
     final static String DEFAULT_CHANNEL_NAME = "general";
     final static String TAG = "TwilioChat";
+
+    // Update this identity for each individual user, for instance after they login
+    private String mIdentity = "USER_IDENTITY";
 
     private RecyclerView mMessagesRecyclerView;
     private MessagesAdapter mMessagesAdapter;
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private void retrieveAccessTokenfromServer() {
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        String tokenURL = SERVER_TOKEN_URL + "?device=" + deviceId;
+        String tokenURL = SERVER_TOKEN_URL + "?device=" + deviceId + "&identity=" + mIdentity;
 
         Ion.with(this)
                 .load(tokenURL)
@@ -117,10 +116,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCompleted(Exception e, JsonObject result) {
                         if (e == null) {
-                            String identity = result.get("identity").getAsString();
                             String accessToken = result.get("token").getAsString();
 
-                            setTitle(identity);
+                            setTitle(mIdentity);
 
                             ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
                             builder.setSynchronizationStrategy(ChatClient.SynchronizationStrategy.ALL);
@@ -128,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
                             ChatClient.create(MainActivity.this,accessToken,props,mChatClientCallback);
 
                         } else {
+                            Log.e(TAG,e.getMessage(),e);
                             Toast.makeText(MainActivity.this,
                                     R.string.error_retrieving_access_token, Toast.LENGTH_SHORT)
                                     .show();
