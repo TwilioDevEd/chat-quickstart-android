@@ -7,15 +7,12 @@ let's get cracking!
 ## Gather Account Information
 
 The first thing we need to do is grab all the necessary configuration values from our
-Twilio account. To set up our back-end for Chat, we will need five 
+Twilio account. To set up our back-end for Chat, we will need two 
 pieces of information:
 
 | Config Value  | Description |
 | :-------------  |:------------- |
 Service Instance SID | Like a database for your Chat data - [generate one in the console here](https://www.twilio.com/console/chat/services)
-Account SID | Your primary Twilio account identifier - find this [in the console here](https://www.twilio.com/console/chat/getting-started).
-API Key | Used to authenticate - [generate one here](https://www.twilio.com/console/chat/dev-tools/api-keys).
-API Secret | Used to authenticate - [just like the above, you'll get one here](https://www.twilio.com/console/chat/dev-tools/api-keys).
 Mobile Push Credential SID | Used to send notifications from Chat to your app - [create one in the console here](https://www.twilio.com/console/chat/credentials) or learn more about [Chat Push Notifications in Android](https://www.twilio.com/docs/api/chat/guides/push-notifications-android).
 
 ## Create a Twilio Function
@@ -33,9 +30,6 @@ Want to learn more about the code in the Function template, or want to write you
 Now that the Twilio Function is set up, let's get the starter Android app up and running.
 
 ## Configure and Run the Mobile App
-
-At the time of writing, the Twilio Chat library does not run in x86-64 emulators.
-You may need to run the Android app on your own phone or tablet.
 
 Once the app loads, you should see a UI like this one:
 
