@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     final static String TAG = "TwilioChat";
 
     // Update this identity for each individual user, for instance after they login
-    private String mIdentity = "USER_IDENTITY";
+    private String mIdentity = "CHAT_USER";
 
     private RecyclerView mMessagesRecyclerView;
     private MessagesAdapter mMessagesAdapter;
@@ -76,11 +76,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (mGeneralChannel != null) {
                     String messageBody = mWriteMessageEditText.getText().toString();
-                    Message message = mGeneralChannel.getMessages().createMessage(messageBody);
+                    Message.Options options = Message.options().withBody(messageBody);
                     Log.d(TAG,"Message created");
-                    mGeneralChannel.getMessages().sendMessage(message, new StatusListener() {
+                    mGeneralChannel.getMessages().sendMessage(options, new CallbackListener<Message>() {
                         @Override
-                        public void onSuccess() {
+                        public void onSuccess(Message message) {
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -88,12 +88,6 @@ public class MainActivity extends AppCompatActivity {
                                     mWriteMessageEditText.setText("");
                                 }
                             });
-
-                        }
-
-                        @Override
-                        public void onError(ErrorInfo errorInfo) {
-                            Log.e(TAG,"Error sending message: " + errorInfo.getMessage());
                         }
                     });
                 }
@@ -101,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         retrieveAccessTokenfromServer();
-
     }
 
     private void retrieveAccessTokenfromServer() {
@@ -118,10 +111,11 @@ public class MainActivity extends AppCompatActivity {
                         if (e == null) {
                             String accessToken = result.get("token").getAsString();
 
+                            Log.d(TAG, "Retrieved access token from server: " + accessToken);
+
                             setTitle(mIdentity);
 
                             ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
-                            builder.setSynchronizationStrategy(ChatClient.SynchronizationStrategy.ALL);
                             ChatClient.Properties props = builder.createProperties();
                             ChatClient.create(MainActivity.this,accessToken,props,mChatClientCallback);
 
@@ -140,13 +134,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Channel channel) {
                 if (channel != null) {
+                    Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
                     joinChannel(channel);
                 } else {
+                    Log.d(TAG, "Creating Channel: " + DEFAULT_CHANNEL_NAME);
+
                     mChatClient.getChannels().createChannel(DEFAULT_CHANNEL_NAME,
                             Channel.ChannelType.PUBLIC, new CallbackListener<Channel>() {
                                 @Override
                                 public void onSuccess(Channel channel) {
                                     if (channel != null) {
+                                        Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
                                         joinChannel(channel);
                                     }
                                 }
@@ -218,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onMessageUpdated(Message message) {
+        public void onMessageUpdated(Message message, Message.UpdateReason updateReason) {
             Log.d(TAG, "Message updated: " + message.getMessageBody());
         }
 
@@ -233,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onMemberUpdated(Member member) {
+        public void onMemberUpdated(Member member, Member.UpdateReason updateReason) {
             Log.d(TAG, "Member updated: " + member.getIdentity());
         }
 
@@ -243,12 +241,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onTypingStarted(Member member) {
+        public void onTypingStarted(Channel channel, Member member) {
             Log.d(TAG, "Started Typing: " + member.getIdentity());
         }
 
         @Override
-        public void onTypingEnded(Member member) {
+        public void onTypingEnded(Channel channel, Member member) {
             Log.d(TAG, "Ended Typing: " + member.getIdentity());
         }
 
