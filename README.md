@@ -29,6 +29,12 @@ Want to learn more about the code in the Function template, or want to write you
 
 Now that the Twilio Function is set up, let's get the starter Android app up and running.
 
+### Warning!
+
+NOTE: You should not use Twilio Functions to generate access tokens for your app in production. Each function has a publicly accessible URL which a malicious actor could use to obtain tokens for your app and abuse them.
+
+[Read more about access tokens here](https://www.twilio.com/docs/api/chat/guides/identity) to learn how to generate access tokens in your own C#, Java, Node.js, PHP, Python, or Ruby application.
+
 ## Configure and Run the Mobile App
 
 Once the app loads, you should see a UI like this one:
