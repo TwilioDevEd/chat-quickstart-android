@@ -23,7 +23,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     implementation "com.twilio:chat-android:3.1.1"
-    implementation 'com.koushikdutta.ion:ion:2.1.7'
+    implementation 'com.koushikdutta.ion:ion:3.0.8'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
