@@ -32,6 +32,7 @@
             android:layout_weight="10"
             android:layout_height="wrap_content"
             android:id="@+id/writeMessageEditText"
+            android:hint="@string/write_message"
             android:layout_marginEnd="@dimen/default_item_spacing"
             android:textColor="@color/colorAccent" />
         <Button

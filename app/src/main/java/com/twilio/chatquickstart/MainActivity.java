@@ -1,7 +1,6 @@
 package com.twilio.chatquickstart;
 
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +26,7 @@ import com.twilio.chat.Message;
 import com.twilio.chat.StatusListener;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,12 +36,10 @@ public class MainActivity extends AppCompatActivity {
     // Update this identity for each individual user, for instance after they login
     private String mIdentity = "CHAT_USER";
 
-    private RecyclerView mMessagesRecyclerView;
     private MessagesAdapter mMessagesAdapter;
     private ArrayList<Message> mMessages = new ArrayList<>();
 
     private EditText mWriteMessageEditText;
-    private Button mSendChatMessageButton;
 
     private ChatClient mChatClient;
 
@@ -53,20 +51,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mMessagesRecyclerView = (RecyclerView) findViewById(R.id.messagesRecyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.messagesRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         // for a chat app, show latest at the bottom
         layoutManager.setStackFromEnd(true);
-        mMessagesRecyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(layoutManager);
 
         mMessagesAdapter = new MessagesAdapter();
-        mMessagesRecyclerView.setAdapter(mMessagesAdapter);
+        recyclerView.setAdapter(mMessagesAdapter);
 
         mWriteMessageEditText = (EditText) findViewById(R.id.writeMessageEditText);
 
-        mSendChatMessageButton = (Button) findViewById(R.id.sendChatMessageButton);
-        mSendChatMessageButton.setOnClickListener(new View.OnClickListener() {
+        Button sendChatMessageButton = (Button) findViewById(R.id.sendChatMessageButton);
+        sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mGeneralChannel != null) {
@@ -93,7 +91,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void retrieveAccessTokenfromServer() {
-        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        // In this case, we are using a random UUID, as we don't really care about which device the
+        // user is on, just that the endpoint id for Chat is unique.
+        // You could use an instance id, if you wanted.
+        // For more, see https://developer.android.com/training/articles/user-data-ids#java
+        String deviceId = UUID.randomUUID().toString();
 
         // Set the chat token URL in your strings.xml file
         String chatTokenURL = getString(R.string.chat_token_url);
@@ -131,8 +133,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Channel channel) {
                 if (channel != null) {
-                    Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
-                    joinChannel(channel);
+                    Channel.ChannelStatus status = channel.getStatus();
+                    if (channel.getStatus() == Channel.ChannelStatus.JOINED
+                            || channel.getStatus() == Channel.ChannelStatus.NOT_PARTICIPATING) {
+                        Log.d(TAG, "Already Exists in Channel: " + DEFAULT_CHANNEL_NAME);
+                        mGeneralChannel = channel;
+                        mGeneralChannel.addListener(mDefaultChannelListener);
+                    } else {
+                        Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
+                        joinChannel(channel);
+                    }
                 } else {
                     Log.d(TAG, "Creating Channel: " + DEFAULT_CHANNEL_NAME);
 
