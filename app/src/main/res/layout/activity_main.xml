@@ -9,7 +9,7 @@
     android:orientation="vertical"
     tools:context="com.twilio.chatquickstart.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
