@@ -1,6 +1,7 @@
 package com.twilio.chatquickstart;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,14 +31,14 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    final static String DEFAULT_CHANNEL_NAME = "general";
-    final static String TAG = "TwilioChat";
+    private final static String DEFAULT_CHANNEL_NAME = "general";
+    private final static String TAG = "TwilioChat";
 
     // Update this identity for each individual user, for instance after they login
     private String mIdentity = "CHAT_USER";
 
     private MessagesAdapter mMessagesAdapter;
-    private ArrayList<Message> mMessages = new ArrayList<>();
+    final private ArrayList<Message> mMessages = new ArrayList<>();
 
     private EditText mWriteMessageEditText;
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.messagesRecyclerView);
+        RecyclerView recyclerView = findViewById(R.id.messagesRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         // for a chat app, show latest at the bottom
@@ -61,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
         mMessagesAdapter = new MessagesAdapter();
         recyclerView.setAdapter(mMessagesAdapter);
 
-        mWriteMessageEditText = (EditText) findViewById(R.id.writeMessageEditText);
+        mWriteMessageEditText = findViewById(R.id.writeMessageEditText);
 
-        Button sendChatMessageButton = (Button) findViewById(R.id.sendChatMessageButton);
+        Button sendChatMessageButton = findViewById(R.id.sendChatMessageButton);
         sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,10 +88,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        retrieveAccessTokenfromServer();
+        retrieveAccessTokenFromServer();
     }
 
-    private void retrieveAccessTokenfromServer() {
+    private void retrieveAccessTokenFromServer() {
         // In this case, we are using a random UUID, as we don't really care about which device the
         // user is on, just that the endpoint id for Chat is unique.
         // You could use an instance id, if you wanted.
@@ -133,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Channel channel) {
                 if (channel != null) {
-                    Channel.ChannelStatus status = channel.getStatus();
                     if (channel.getStatus() == Channel.ChannelStatus.JOINED
                             || channel.getStatus() == Channel.ChannelStatus.NOT_PARTICIPATING) {
                         Log.d(TAG, "Already Exists in Channel: " + DEFAULT_CHANNEL_NAME);
@@ -268,18 +268,19 @@ public class MainActivity extends AppCompatActivity {
 
         class ViewHolder extends RecyclerView.ViewHolder {
 
-            public TextView mMessageTextView;
+            TextView mMessageTextView;
 
-            public ViewHolder(TextView textView) {
+            ViewHolder(TextView textView) {
                 super(textView);
                 mMessageTextView = textView;
             }
         }
 
-        public MessagesAdapter() {
+        MessagesAdapter() {
 
         }
 
+        @NonNull
         @Override
         public MessagesAdapter
                 .ViewHolder onCreateViewHolder(ViewGroup parent,
