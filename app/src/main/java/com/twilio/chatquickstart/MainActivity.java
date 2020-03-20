@@ -30,11 +30,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    /*
-       Change this URL to match the token URL for your Twilio Function
-    */
-    final static String SERVER_TOKEN_URL = "https://YOUR_DOMAIN_HERE.twil.io/chat-token";
-
     final static String DEFAULT_CHANNEL_NAME = "general";
     final static String TAG = "TwilioChat";
 
@@ -100,7 +95,9 @@ public class MainActivity extends AppCompatActivity {
     private void retrieveAccessTokenfromServer() {
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        String tokenURL = SERVER_TOKEN_URL + "?device=" + deviceId + "&identity=" + mIdentity;
+        // Set the chat token URL in your strings.xml file
+        String chatTokenURL = getString(R.string.chat_token_url);
+        String tokenURL = chatTokenURL + "?device=" + deviceId + "&identity=" + mIdentity;
 
         Ion.with(this)
                 .load(tokenURL)

@@ -2,4 +2,5 @@
     <string name="app_name">ChatQuickstart</string>
     <string name="error_retrieving_access_token">Error retrieving access token from the server.</string>
     <string name="send">Send</string>
+    <string name="chat_token_url">https://YOUR_DOMAIN_HERE.twil.io/chat-token</string>
 </resources>
