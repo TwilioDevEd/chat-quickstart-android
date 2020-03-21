@@ -31,19 +31,24 @@ Now that the Twilio Function is set up, let's get the starter Android app up and
 
 ### Warning!
 
-NOTE: You should not use Twilio Functions to generate access tokens for your app in production. Each function has a publicly accessible URL which a malicious actor could use to obtain tokens for your app and abuse them.
+NOTE: You should not use Twilio Functions without some kind of access control to generate access tokens for your app in production. Each function has a publicly accessible URL which a malicious actor could use to obtain tokens for your app and abuse them.
 
 [Read more about access tokens here](https://www.twilio.com/docs/api/chat/guides/identity) to learn how to generate access tokens in your own C#, Java, Node.js, PHP, Python, or Ruby application.
 
 ## Configure and Run the Mobile App
 
+Open the project in Android Studio - there is one step you need to take to connect the app to your Twilio function.
+
+You will need to change the Chat Token URL in the `strings.xml` file to point to the URL of your Twilio function.
+
+Now go ahead and run the app, either on an Android Emulator or on a device.
+
 Once the app loads, you should see a UI like this one:
 
 ![quick start app screenshot](http://i.imgur.com/WgKdQcr.png)
 
-Start sending yourself a few messages - they should start appearing both in a
-`RecyclerView` in the starter app, and in your browser as well if you kept that
-window open.
+Start sending yourself a few messages - they should start appearing in a
+`RecyclerView` in the starter app. If you connect multiple devices, the messages will appear on all of them.
 
 You're all set! From here, you can start building your own application. For guidance
 on integrating the Android SDK into your existing project, [head over to our install guide](https://www.twilio.com/docs/api/chat/sdks).
