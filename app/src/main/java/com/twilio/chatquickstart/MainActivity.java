@@ -1,57 +1,40 @@
 package com.twilio.chatquickstart;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
-import com.twilio.chat.CallbackListener;
-import com.twilio.chat.Channel;
-import com.twilio.chat.ChannelListener;
-import com.twilio.chat.ChatClient;
-import com.twilio.chat.ErrorInfo;
-import com.twilio.chat.Member;
 import com.twilio.chat.Message;
-import com.twilio.chat.StatusListener;
 
-import java.util.ArrayList;
-import java.util.UUID;
+public class MainActivity extends AppCompatActivity implements QuickstartChatManagerListener {
 
-public class MainActivity extends AppCompatActivity {
-
-    private final static String DEFAULT_CHANNEL_NAME = "general";
-    private final static String TAG = "TwilioChat";
+    public final static String TAG = "TwilioChat";
 
     // Update this identity for each individual user, for instance after they login
     private String mIdentity = "CHAT_USER";
 
     private MessagesAdapter mMessagesAdapter;
-    final private ArrayList<Message> mMessages = new ArrayList<>();
 
     private EditText mWriteMessageEditText;
 
-    private ChatClient mChatClient;
-
-    private Channel mGeneralChannel;
+    private QuickstartChatManager quickstartChatManager = new QuickstartChatManager();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        quickstartChatManager.setChatManagerListener(this);
 
         RecyclerView recyclerView = findViewById(R.id.messagesRecyclerView);
 
@@ -65,205 +48,49 @@ public class MainActivity extends AppCompatActivity {
 
         mWriteMessageEditText = findViewById(R.id.writeMessageEditText);
 
+        setTitle(mIdentity);
+
+
         Button sendChatMessageButton = findViewById(R.id.sendChatMessageButton);
         sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mGeneralChannel != null) {
-                    String messageBody = mWriteMessageEditText.getText().toString();
-                    Message.Options options = Message.options().withBody(messageBody);
-                    Log.d(TAG,"Message created");
-                    mGeneralChannel.getMessages().sendMessage(options, new CallbackListener<Message>() {
-                        @Override
-                        public void onSuccess(Message message) {
-                            MainActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // need to modify user interface elements on the UI thread
-                                    mWriteMessageEditText.setText("");
-                                }
-                            });
-                        }
-                    });
-                }
+                String messageBody = mWriteMessageEditText.getText().toString();
+                quickstartChatManager.sendChatMessage(messageBody);
             }
         });
 
-        retrieveAccessTokenFromServer();
+        quickstartChatManager.retrieveAccessTokenFromServer(this, mIdentity);
     }
 
-    private void retrieveAccessTokenFromServer() {
-        // In this case, we are using a random UUID, as we don't really care about which device the
-        // user is on, just that the endpoint id for Chat is unique.
-        // You could use an instance id, if you wanted.
-        // For more, see https://developer.android.com/training/articles/user-data-ids#java
-        String deviceId = UUID.randomUUID().toString();
 
-        // Set the chat token URL in your strings.xml file
-        String chatTokenURL = getString(R.string.chat_token_url);
-        String tokenURL = chatTokenURL + "?device=" + deviceId + "&identity=" + mIdentity;
 
-        Ion.with(this)
-                .load(tokenURL)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e == null) {
-                            String accessToken = result.get("token").getAsString();
-
-                            Log.d(TAG, "Retrieved access token from server: " + accessToken);
-
-                            setTitle(mIdentity);
-
-                            ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
-                            ChatClient.Properties props = builder.createProperties();
-                            ChatClient.create(MainActivity.this,accessToken,props,mChatClientCallback);
-
-                        } else {
-                            Log.e(TAG,e.getMessage(),e);
-                            Toast.makeText(MainActivity.this,
-                                    R.string.error_retrieving_access_token, Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    }
-                });
-    }
-
-    private void loadChannels() {
-        mChatClient.getChannels().getChannel(DEFAULT_CHANNEL_NAME, new CallbackListener<Channel>() {
-            @Override
-            public void onSuccess(Channel channel) {
-                if (channel != null) {
-                    if (channel.getStatus() == Channel.ChannelStatus.JOINED
-                            || channel.getStatus() == Channel.ChannelStatus.NOT_PARTICIPATING) {
-                        Log.d(TAG, "Already Exists in Channel: " + DEFAULT_CHANNEL_NAME);
-                        mGeneralChannel = channel;
-                        mGeneralChannel.addListener(mDefaultChannelListener);
-                    } else {
-                        Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
-                        joinChannel(channel);
-                    }
-                } else {
-                    Log.d(TAG, "Creating Channel: " + DEFAULT_CHANNEL_NAME);
-
-                    mChatClient.getChannels().createChannel(DEFAULT_CHANNEL_NAME,
-                            Channel.ChannelType.PUBLIC, new CallbackListener<Channel>() {
-                                @Override
-                                public void onSuccess(Channel channel) {
-                                    if (channel != null) {
-                                        Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
-                                        joinChannel(channel);
-                                    }
-                                }
-
-                                @Override
-                                public void onError(ErrorInfo errorInfo) {
-                                    Log.e(TAG,"Error creating channel: " + errorInfo.getMessage());
-                                }
-                            });
-                }
-            }
-
-            @Override
-            public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG,"Error retrieving channel: " + errorInfo.getMessage());
-            }
-
-        });
+    @Override
+    public void reloadMessages() {
 
     }
 
-    private void joinChannel(final Channel channel) {
-        Log.d(TAG, "Joining Channel: " + channel.getUniqueName());
-        channel.join(new StatusListener() {
+    @Override
+    public void receivedNewMessage() {
+        runOnUiThread(new Runnable() {
             @Override
-            public void onSuccess() {
-                mGeneralChannel = channel;
-                Log.d(TAG, "Joined default channel");
-                mGeneralChannel.addListener(mDefaultChannelListener);
-            }
-
-            @Override
-            public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG,"Error joining channel: " + errorInfo.getMessage());
+            public void run() {
+                // need to modify user interface elements on the UI thread
+                mMessagesAdapter.notifyDataSetChanged();
             }
         });
     }
 
-    private CallbackListener<ChatClient> mChatClientCallback =
-            new CallbackListener<ChatClient>() {
-                @Override
-                public void onSuccess(ChatClient chatClient) {
-                    mChatClient = chatClient;
-                    loadChannels();
-                    Log.d(TAG, "Success creating Twilio Chat Client");
-                }
-
-                @Override
-                public void onError(ErrorInfo errorInfo) {
-                    Log.e(TAG,"Error creating Twilio Chat Client: " + errorInfo.getMessage());
-                }
-            };
-
-    private ChannelListener mDefaultChannelListener = new ChannelListener() {
-
-
-        @Override
-        public void onMessageAdded(final Message message) {
-            Log.d(TAG, "Message added");
-            MainActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // need to modify user interface elements on the UI thread
-                    mMessages.add(message);
-                    mMessagesAdapter.notifyDataSetChanged();
-                }
-            });
-
-        }
-
-        @Override
-        public void onMessageUpdated(Message message, Message.UpdateReason updateReason) {
-            Log.d(TAG, "Message updated: " + message.getMessageBody());
-        }
-
-        @Override
-        public void onMessageDeleted(Message message) {
-            Log.d(TAG, "Message deleted");
-        }
-
-        @Override
-        public void onMemberAdded(Member member) {
-            Log.d(TAG, "Member added: " + member.getIdentity());
-        }
-
-        @Override
-        public void onMemberUpdated(Member member, Member.UpdateReason updateReason) {
-            Log.d(TAG, "Member updated: " + member.getIdentity());
-        }
-
-        @Override
-        public void onMemberDeleted(Member member) {
-            Log.d(TAG, "Member deleted: " + member.getIdentity());
-        }
-
-        @Override
-        public void onTypingStarted(Channel channel, Member member) {
-            Log.d(TAG, "Started Typing: " + member.getIdentity());
-        }
-
-        @Override
-        public void onTypingEnded(Channel channel, Member member) {
-            Log.d(TAG, "Ended Typing: " + member.getIdentity());
-        }
-
-        @Override
-        public void onSynchronizationChanged(Channel channel) {
-
-        }
-    };
-
+    @Override
+    public void messageSentCallback() {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // need to modify user interface elements on the UI thread
+                mWriteMessageEditText.setText("");
+            }
+        });
+    }
 
     class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder> {
 
@@ -293,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Message message = mMessages.get(position);
+            Message message = quickstartChatManager.getMessages().get(position);
             String messageText = String.format("%s: %s", message.getAuthor(), message.getMessageBody());
             holder.mMessageTextView.setText(messageText);
 
@@ -301,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return mMessages.size();
+            return quickstartChatManager.getMessages().size();
         }
     }
 
