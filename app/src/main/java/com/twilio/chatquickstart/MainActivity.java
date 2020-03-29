@@ -20,13 +20,13 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
     public final static String TAG = "TwilioChat";
 
     // Update this identity for each individual user, for instance after they login
-    private String mIdentity = "CHAT_USER";
+    private String identity = "CHAT_USER";
 
-    private MessagesAdapter mMessagesAdapter;
+    private MessagesAdapter messagesAdapter;
 
-    private EditText mWriteMessageEditText;
+    private EditText writeMessageEditText;
 
-    private QuickstartChatManager quickstartChatManager = new QuickstartChatManager();
+    private final QuickstartChatManager quickstartChatManager = new QuickstartChatManager();
 
 
     @Override
@@ -43,24 +43,24 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        mMessagesAdapter = new MessagesAdapter();
-        recyclerView.setAdapter(mMessagesAdapter);
+        messagesAdapter = new MessagesAdapter();
+        recyclerView.setAdapter(messagesAdapter);
 
-        mWriteMessageEditText = findViewById(R.id.writeMessageEditText);
+        writeMessageEditText = findViewById(R.id.writeMessageEditText);
 
-        setTitle(mIdentity);
+        setTitle(identity);
 
 
         Button sendChatMessageButton = findViewById(R.id.sendChatMessageButton);
         sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String messageBody = mWriteMessageEditText.getText().toString();
+                String messageBody = writeMessageEditText.getText().toString();
                 quickstartChatManager.sendChatMessage(messageBody);
             }
         });
 
-        quickstartChatManager.retrieveAccessTokenFromServer(this, mIdentity);
+        quickstartChatManager.retrieveAccessTokenFromServer(this, identity);
     }
 
 
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
             @Override
             public void run() {
                 // need to modify user interface elements on the UI thread
-                mMessagesAdapter.notifyDataSetChanged();
+                messagesAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
             @Override
             public void run() {
                 // need to modify user interface elements on the UI thread
-                mWriteMessageEditText.setText("");
+                writeMessageEditText.setText("");
             }
         });
     }
@@ -96,11 +96,11 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
 
         class ViewHolder extends RecyclerView.ViewHolder {
 
-            TextView mMessageTextView;
+            final TextView messageTextView;
 
             ViewHolder(TextView textView) {
                 super(textView);
-                mMessageTextView = textView;
+                messageTextView = textView;
             }
         }
 
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
         public void onBindViewHolder(ViewHolder holder, int position) {
             Message message = quickstartChatManager.getMessages().get(position);
             String messageText = String.format("%s: %s", message.getAuthor(), message.getMessageBody());
-            holder.mMessageTextView.setText(messageText);
+            holder.messageTextView.setText(messageText);
 
         }
 

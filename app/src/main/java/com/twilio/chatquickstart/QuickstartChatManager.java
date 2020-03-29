@@ -26,15 +26,13 @@ interface QuickstartChatManagerListener {
 
 class QuickstartChatManager {
 
-    private final static String TAG = "TwilioChat";
-
     private final static String DEFAULT_CHANNEL_NAME = "general";
 
-    final private ArrayList<Message> mMessages = new ArrayList<>();
+    final private ArrayList<Message> messages = new ArrayList<>();
 
-    private ChatClient mChatClient;
+    private ChatClient chatClient;
 
-    private Channel mChannel;
+    private Channel channel;
 
     private QuickstartChatManagerListener chatManagerListener;
 
@@ -53,7 +51,7 @@ class QuickstartChatManager {
                         if (e == null) {
                             String accessToken = result.get("token").getAsString();
 
-                            Log.d(TAG, "Retrieved access token from server: " + accessToken);
+                            Log.d(MainActivity.TAG, "Retrieved access token from server: " + accessToken);
 
 
                             ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
@@ -71,10 +69,10 @@ class QuickstartChatManager {
     }
 
     void sendChatMessage(String messageBody) {
-        if (mChannel != null) {
+        if (channel != null) {
             Message.Options options = Message.options().withBody(messageBody);
-            Log.d(TAG,"Message created");
-            mChannel.getMessages().sendMessage(options, new CallbackListener<Message>() {
+            Log.d(MainActivity.TAG,"Message created");
+            channel.getMessages().sendMessage(options, new CallbackListener<Message>() {
                 @Override
                 public void onSuccess(Message message) {
                     if (chatManagerListener != null) {
@@ -83,39 +81,39 @@ class QuickstartChatManager {
                 }
             });
         }
-    };
+    }
 
 
     private void loadChannels() {
-        mChatClient.getChannels().getChannel(DEFAULT_CHANNEL_NAME, new CallbackListener<Channel>() {
+        chatClient.getChannels().getChannel(DEFAULT_CHANNEL_NAME, new CallbackListener<Channel>() {
             @Override
             public void onSuccess(Channel channel) {
                 if (channel != null) {
                     if (channel.getStatus() == Channel.ChannelStatus.JOINED
                             || channel.getStatus() == Channel.ChannelStatus.NOT_PARTICIPATING) {
-                        Log.d(TAG, "Already Exists in Channel: " + DEFAULT_CHANNEL_NAME);
-                        mChannel = channel;
-                        mChannel.addListener(mDefaultChannelListener);
+                        Log.d(MainActivity.TAG, "Already Exists in Channel: " + DEFAULT_CHANNEL_NAME);
+                        QuickstartChatManager.this.channel = channel;
+                        QuickstartChatManager.this.channel.addListener(mDefaultChannelListener);
                     } else {
-                        Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
+                        Log.d(MainActivity.TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
                         joinChannel(channel);
                     }
                 } else {
-                    Log.d(TAG, "Creating Channel: " + DEFAULT_CHANNEL_NAME);
+                    Log.d(MainActivity.TAG, "Creating Channel: " + DEFAULT_CHANNEL_NAME);
 
-                    mChatClient.getChannels().createChannel(DEFAULT_CHANNEL_NAME,
+                    chatClient.getChannels().createChannel(DEFAULT_CHANNEL_NAME,
                             Channel.ChannelType.PRIVATE, new CallbackListener<Channel>() {
                                 @Override
                                 public void onSuccess(Channel channel) {
                                     if (channel != null) {
-                                        Log.d(TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
+                                        Log.d(MainActivity.TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
                                         joinChannel(channel);
                                     }
                                 }
 
                                 @Override
                                 public void onError(ErrorInfo errorInfo) {
-                                    Log.e(TAG, "Error creating channel: " + errorInfo.getMessage());
+                                    Log.e(MainActivity.TAG, "Error creating channel: " + errorInfo.getMessage());
                                 }
                             });
                 }
@@ -123,52 +121,52 @@ class QuickstartChatManager {
 
             @Override
             public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG, "Error retrieving channel: " + errorInfo.getMessage());
+                Log.e(MainActivity.TAG, "Error retrieving channel: " + errorInfo.getMessage());
             }
 
         });
     }
 
     private void joinChannel(final Channel channel) {
-        Log.d(TAG, "Joining Channel: " + channel.getUniqueName());
+        Log.d(MainActivity.TAG, "Joining Channel: " + channel.getUniqueName());
         channel.join(new StatusListener() {
             @Override
             public void onSuccess() {
-                mChannel = channel;
-                Log.d(TAG, "Joined default channel");
-                mChannel.addListener(mDefaultChannelListener);
+                QuickstartChatManager.this.channel = channel;
+                Log.d(MainActivity.TAG, "Joined default channel");
+                QuickstartChatManager.this.channel.addListener(mDefaultChannelListener);
             }
 
             @Override
             public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG, "Error joining channel: " + errorInfo.getMessage());
+                Log.e(MainActivity.TAG, "Error joining channel: " + errorInfo.getMessage());
             }
         });
     }
 
-    private CallbackListener<ChatClient> mChatClientCallback =
+    private final CallbackListener<ChatClient> mChatClientCallback =
             new CallbackListener<ChatClient>() {
                 @Override
                 public void onSuccess(ChatClient chatClient) {
-                    mChatClient = chatClient;
+                    QuickstartChatManager.this.chatClient = chatClient;
                     loadChannels();
-                    Log.d(TAG, "Success creating Twilio Chat Client");
+                    Log.d(MainActivity.TAG, "Success creating Twilio Chat Client");
                 }
 
                 @Override
                 public void onError(ErrorInfo errorInfo) {
-                    Log.e(TAG, "Error creating Twilio Chat Client: " + errorInfo.getMessage());
+                    Log.e(MainActivity.TAG, "Error creating Twilio Chat Client: " + errorInfo.getMessage());
                 }
             };
 
 
-    private ChannelListener mDefaultChannelListener = new ChannelListener() {
+    private final ChannelListener mDefaultChannelListener = new ChannelListener() {
 
 
         @Override
         public void onMessageAdded(final Message message) {
             Log.d(MainActivity.TAG, "Message added");
-            mMessages.add(message);
+            messages.add(message);
             if (chatManagerListener != null) {
                 chatManagerListener.receivedNewMessage();
             }
@@ -176,37 +174,37 @@ class QuickstartChatManager {
 
         @Override
         public void onMessageUpdated(Message message, Message.UpdateReason updateReason) {
-            Log.d(TAG, "Message updated: " + message.getMessageBody());
+            Log.d(MainActivity.TAG, "Message updated: " + message.getMessageBody());
         }
 
         @Override
         public void onMessageDeleted(Message message) {
-            Log.d(TAG, "Message deleted");
+            Log.d(MainActivity.TAG, "Message deleted");
         }
 
         @Override
         public void onMemberAdded(Member member) {
-            Log.d(TAG, "Member added: " + member.getIdentity());
+            Log.d(MainActivity.TAG, "Member added: " + member.getIdentity());
         }
 
         @Override
         public void onMemberUpdated(Member member, Member.UpdateReason updateReason) {
-            Log.d(TAG, "Member updated: " + member.getIdentity());
+            Log.d(MainActivity.TAG, "Member updated: " + member.getIdentity());
         }
 
         @Override
         public void onMemberDeleted(Member member) {
-            Log.d(TAG, "Member deleted: " + member.getIdentity());
+            Log.d(MainActivity.TAG, "Member deleted: " + member.getIdentity());
         }
 
         @Override
         public void onTypingStarted(Channel channel, Member member) {
-            Log.d(TAG, "Started Typing: " + member.getIdentity());
+            Log.d(MainActivity.TAG, "Started Typing: " + member.getIdentity());
         }
 
         @Override
         public void onTypingEnded(Channel channel, Member member) {
-            Log.d(TAG, "Ended Typing: " + member.getIdentity());
+            Log.d(MainActivity.TAG, "Ended Typing: " + member.getIdentity());
         }
 
         @Override
@@ -216,7 +214,7 @@ class QuickstartChatManager {
     };
 
     public ArrayList<Message> getMessages() {
-        return mMessages;
+        return messages;
     }
 
     public void setChatManagerListener(QuickstartChatManagerListener listener)  {
