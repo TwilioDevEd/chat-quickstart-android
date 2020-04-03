@@ -2,11 +2,8 @@ package com.twilio.chatquickstart;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
+import com.google.gson.Gson;
 import com.twilio.chat.CallbackListener;
 import com.twilio.chat.Channel;
 import com.twilio.chat.ChannelListener;
@@ -16,7 +13,12 @@ import com.twilio.chat.Member;
 import com.twilio.chat.Message;
 import com.twilio.chat.StatusListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 interface QuickstartChatManagerListener {
     void reloadMessages();
@@ -26,6 +28,7 @@ interface QuickstartChatManagerListener {
 
 class QuickstartChatManager {
 
+    // This is the unique name of the chat channel we are using
     private final static String DEFAULT_CHANNEL_NAME = "general";
 
     final private ArrayList<Message> messages = new ArrayList<>();
@@ -36,36 +39,48 @@ class QuickstartChatManager {
 
     private QuickstartChatManagerListener chatManagerListener;
 
+    private class TokenResponse {
+        String token;
+    }
+
     void retrieveAccessTokenFromServer(final Context context, String identity) {
 
         // Set the chat token URL in your strings.xml file
         String chatTokenURL = context.getString(R.string.chat_token_url);
-        String tokenURL = chatTokenURL + "?identity=" + identity;
+        final String tokenURL = chatTokenURL + "?identity=" + identity;
 
-        Ion.with(context)
-                .load(tokenURL)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if (e == null) {
-                            String accessToken = result.get("token").getAsString();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                retrieveToken(context, tokenURL);
+            }
+        }).start();
+    }
 
-                            Log.d(MainActivity.TAG, "Retrieved access token from server: " + accessToken);
+    private void retrieveToken(final Context context, String tokenURL) {
+        OkHttpClient client = new OkHttpClient();
 
+        Request request = new Request.Builder()
+                .url(tokenURL)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            Gson gson = new Gson();
+            TokenResponse tokenResponse = gson.fromJson(responseBody,TokenResponse.class);
+            String accessToken = tokenResponse.token;
+            Log.d(MainActivity.TAG, "Retrieved access token from server: " + accessToken);
 
-                            ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
-                            ChatClient.Properties props = builder.createProperties();
-                            ChatClient.create(context, accessToken, props, mChatClientCallback);
+            ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
+            ChatClient.Properties props = builder.createProperties();
+            ChatClient.create(context, accessToken, props, mChatClientCallback);
 
-                        } else {
-                            Log.e(MainActivity.TAG, e.getMessage(), e);
-                            Toast.makeText(context,
-                                    R.string.error_retrieving_access_token, Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    }
-                });
+        }
+        catch (IOException ex) {
+            Log.e(MainActivity.TAG, ex.getLocalizedMessage(),ex);
+                /*Toast.makeText(context,
+                        R.string.error_retrieving_access_token, Toast.LENGTH_SHORT)
+                        .show();*/
+        }
     }
 
     void sendChatMessage(String messageBody) {

@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
 
     private final QuickstartChatManager quickstartChatManager = new QuickstartChatManager();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
         RecyclerView recyclerView = findViewById(R.id.messagesRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        // for a chat app, show latest at the bottom
+
+        // for a chat app, show latest messages at the bottom
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
         writeMessageEditText = findViewById(R.id.writeMessageEditText);
 
         setTitle(identity);
-
 
         Button sendChatMessageButton = findViewById(R.id.sendChatMessageButton);
         sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -123,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
             Message message = quickstartChatManager.getMessages().get(position);
             String messageText = String.format("%s: %s", message.getAuthor(), message.getMessageBody());
             holder.messageTextView.setText(messageText);
-
         }
 
         @Override
@@ -131,6 +129,4 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
             return quickstartChatManager.getMessages().size();
         }
     }
-
-
 }
