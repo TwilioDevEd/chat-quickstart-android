@@ -21,7 +21,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 interface QuickstartChatManagerListener {
-    void reloadMessages();
     void receivedNewMessage();
     void messageSentCallback();
 }

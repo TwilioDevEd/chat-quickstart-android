@@ -62,13 +62,6 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
         quickstartChatManager.retrieveAccessTokenFromServer(this, identity);
     }
 
-
-
-    @Override
-    public void reloadMessages() {
-
-    }
-
     @Override
     public void receivedNewMessage() {
         runOnUiThread(new Runnable() {
