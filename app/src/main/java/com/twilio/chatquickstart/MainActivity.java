@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.twilio.chat.Message;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MainActivity extends AppCompatActivity implements QuickstartChatManagerListener {
 
@@ -48,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
 
         writeMessageEditText = findViewById(R.id.writeMessageEditText);
 
-        setTitle(identity);
 
         Button sendChatMessageButton = findViewById(R.id.sendChatMessageButton);
         sendChatMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +62,25 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
             }
         });
 
-        quickstartChatManager.retrieveAccessTokenFromServer(this, identity);
+        quickstartChatManager.retrieveAccessTokenFromServer(this, identity, new TokenResponseListener() {
+            @Override
+            public void receivedTokenResponse(@NotNull boolean success, @Nullable Exception exception) {
+                if (success) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // need to modify user interface elements on the UI thread
+                            setTitle(identity);
+                        }
+                    });
+                }
+                else {
+                    Toast.makeText(MainActivity.this,
+                            R.string.error_retrieving_access_token, Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+        });
     }
 
     @Override

@@ -8,10 +8,15 @@ import com.twilio.chat.CallbackListener;
 import com.twilio.chat.Channel;
 import com.twilio.chat.ChannelListener;
 import com.twilio.chat.ChatClient;
+import com.twilio.chat.ChatClientListener;
 import com.twilio.chat.ErrorInfo;
 import com.twilio.chat.Member;
 import com.twilio.chat.Message;
 import com.twilio.chat.StatusListener;
+import com.twilio.chat.User;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +29,11 @@ interface QuickstartChatManagerListener {
     void receivedNewMessage();
     void messageSentCallback();
 }
+
+interface TokenResponseListener {
+    void receivedTokenResponse(@NotNull  boolean success, @Nullable Exception exception);
+}
+
 
 class QuickstartChatManager {
 
@@ -42,7 +52,8 @@ class QuickstartChatManager {
         String token;
     }
 
-    void retrieveAccessTokenFromServer(final Context context, String identity) {
+    void retrieveAccessTokenFromServer(final Context context, String identity,
+                                       final TokenResponseListener listener) {
 
         // Set the chat token URL in your strings.xml file
         String chatTokenURL = context.getString(R.string.chat_token_url);
@@ -51,12 +62,13 @@ class QuickstartChatManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                retrieveToken(context, tokenURL);
+                retrieveToken(context, tokenURL, listener);
             }
         }).start();
     }
 
-    private void retrieveToken(final Context context, String tokenURL) {
+    private void retrieveToken(final Context context, String tokenURL,
+                               TokenResponseListener listener) {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -64,6 +76,7 @@ class QuickstartChatManager {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             String responseBody = response.body().string();
+            Log.d(MainActivity.TAG, "Response from server: " + responseBody);
             Gson gson = new Gson();
             TokenResponse tokenResponse = gson.fromJson(responseBody,TokenResponse.class);
             String accessToken = tokenResponse.token;
@@ -72,13 +85,11 @@ class QuickstartChatManager {
             ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
             ChatClient.Properties props = builder.createProperties();
             ChatClient.create(context, accessToken, props, mChatClientCallback);
-
+            listener.receivedTokenResponse(true,null);
         }
         catch (IOException ex) {
             Log.e(MainActivity.TAG, ex.getLocalizedMessage(),ex);
-                /*Toast.makeText(context,
-                        R.string.error_retrieving_access_token, Toast.LENGTH_SHORT)
-                        .show();*/
+            listener.receivedTokenResponse(true, ex);
         }
     }
 
@@ -158,12 +169,117 @@ class QuickstartChatManager {
         });
     }
 
+    private final ChatClientListener mChatClientListener =
+            new ChatClientListener() {
+                @Override
+                public void onChannelJoined(Channel channel) {
+
+                }
+
+                @Override
+                public void onChannelInvited(Channel channel) {
+
+                }
+
+                @Override
+                public void onChannelAdded(Channel channel) {
+
+                }
+
+                @Override
+                public void onChannelUpdated(Channel channel, Channel.UpdateReason updateReason) {
+
+                }
+
+                @Override
+                public void onChannelDeleted(Channel channel) {
+
+                }
+
+                @Override
+                public void onChannelSynchronizationChange(Channel channel) {
+
+                }
+
+                @Override
+                public void onError(ErrorInfo errorInfo) {
+
+                }
+
+                @Override
+                public void onUserUpdated(User user, User.UpdateReason updateReason) {
+
+                }
+
+                @Override
+                public void onUserSubscribed(User user) {
+
+                }
+
+                @Override
+                public void onUserUnsubscribed(User user) {
+
+                }
+
+                @Override
+                public void onClientSynchronization(ChatClient.SynchronizationStatus synchronizationStatus) {
+                    if (synchronizationStatus == ChatClient.SynchronizationStatus.COMPLETED) {
+                        loadChannels();
+                    }
+                }
+
+                @Override
+                public void onNewMessageNotification(String s, String s1, long l) {
+
+                }
+
+                @Override
+                public void onAddedToChannelNotification(String s) {
+
+                }
+
+                @Override
+                public void onInvitedToChannelNotification(String s) {
+
+                }
+
+                @Override
+                public void onRemovedFromChannelNotification(String s) {
+
+                }
+
+                @Override
+                public void onNotificationSubscribed() {
+
+                }
+
+                @Override
+                public void onNotificationFailed(ErrorInfo errorInfo) {
+
+                }
+
+                @Override
+                public void onConnectionStateChange(ChatClient.ConnectionState connectionState) {
+
+                }
+
+                @Override
+                public void onTokenExpired() {
+
+                }
+
+                @Override
+                public void onTokenAboutToExpire() {
+
+                }
+            };
+
     private final CallbackListener<ChatClient> mChatClientCallback =
             new CallbackListener<ChatClient>() {
                 @Override
                 public void onSuccess(ChatClient chatClient) {
+                    chatClient.setListener(QuickstartChatManager.this.mChatClientListener);
                     QuickstartChatManager.this.chatClient = chatClient;
-                    loadChannels();
                     Log.d(MainActivity.TAG, "Success creating Twilio Chat Client");
                 }
 
