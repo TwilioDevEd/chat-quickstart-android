@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.twilio.chat.Message;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MainActivity extends AppCompatActivity implements QuickstartChatManagerListener {
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
 
         quickstartChatManager.retrieveAccessTokenFromServer(this, identity, new TokenResponseListener() {
             @Override
-            public void receivedTokenResponse(@NotNull boolean success, @Nullable Exception exception) {
+            public void receivedTokenResponse(boolean success, @Nullable Exception exception) {
                 if (success) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -75,8 +74,13 @@ public class MainActivity extends AppCompatActivity implements QuickstartChatMan
                     });
                 }
                 else {
+                    String errorMessage = getString(R.string.error_retrieving_access_token);
+                    if (exception != null) {
+                        errorMessage = errorMessage + " " + exception.getLocalizedMessage();
+                    }
                     Toast.makeText(MainActivity.this,
-                            R.string.error_retrieving_access_token, Toast.LENGTH_LONG)
+                            errorMessage,
+                            Toast.LENGTH_LONG)
                             .show();
                 }
             }

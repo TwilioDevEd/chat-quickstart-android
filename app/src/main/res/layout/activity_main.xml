@@ -33,7 +33,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/writeMessageEditText"
             android:hint="@string/write_message"
+            android:inputType="textAutoCorrect"
             android:layout_marginEnd="@dimen/default_item_spacing"
+            android:importantForAutofill="no"
             android:textColor="@color/colorAccent" />
         <Button
             android:layout_width="wrap_content"

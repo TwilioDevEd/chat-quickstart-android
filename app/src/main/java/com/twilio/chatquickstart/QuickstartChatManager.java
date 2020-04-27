@@ -15,7 +15,6 @@ import com.twilio.chat.Message;
 import com.twilio.chat.StatusListener;
 import com.twilio.chat.User;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ interface QuickstartChatManagerListener {
 }
 
 interface TokenResponseListener {
-    void receivedTokenResponse(@NotNull  boolean success, @Nullable Exception exception);
+    void receivedTokenResponse(boolean success, @Nullable Exception exception);
 }
 
 
@@ -49,6 +48,7 @@ class QuickstartChatManager {
     private QuickstartChatManagerListener chatManagerListener;
 
     private class TokenResponse {
+        @SuppressWarnings("unused")
         String token;
     }
 
@@ -75,7 +75,10 @@ class QuickstartChatManager {
                 .url(tokenURL)
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            String responseBody = response.body().string();
+            String responseBody = "";
+            if (response != null && response.body() != null) {
+                responseBody = response.body().string();
+            }
             Log.d(MainActivity.TAG, "Response from server: " + responseBody);
             Gson gson = new Gson();
             TokenResponse tokenResponse = gson.fromJson(responseBody,TokenResponse.class);
