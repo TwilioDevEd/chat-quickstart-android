@@ -33,6 +33,10 @@ interface TokenResponseListener {
     void receivedTokenResponse(boolean success, @Nullable Exception exception);
 }
 
+interface AccessTokenListener {
+    void receivedAccessToken(@Nullable String token, @Nullable Exception exception);
+}
+
 
 class QuickstartChatManager {
 
@@ -47,6 +51,8 @@ class QuickstartChatManager {
 
     private QuickstartChatManagerListener chatManagerListener;
 
+    private String tokenURL = "";
+
     private class TokenResponse {
         @SuppressWarnings("unused")
         String token;
@@ -57,18 +63,36 @@ class QuickstartChatManager {
 
         // Set the chat token URL in your strings.xml file
         String chatTokenURL = context.getString(R.string.chat_token_url);
-        final String tokenURL = chatTokenURL + "?identity=" + identity;
+
+        if ("https://YOUR_DOMAIN_HERE.twil.io/chat-token".equals(chatTokenURL)) {
+            listener.receivedTokenResponse(false, new Exception("You need to replace the chat token URL in strings.xml"));
+            return;
+        }
+
+        tokenURL = chatTokenURL + "?identity=" + identity;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                retrieveToken(context, tokenURL, listener);
+            retrieveToken(new AccessTokenListener() {
+                @Override
+                public void receivedAccessToken(@Nullable String token,
+                                                @Nullable Exception exception) {
+                    if (token != null) {
+                        ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
+                        ChatClient.Properties props = builder.createProperties();
+                        ChatClient.create(context, token, props, mChatClientCallback);
+                        listener.receivedTokenResponse(true,null);
+                    } else {
+                        listener.receivedTokenResponse(false, exception);
+                    }
+                }
+            });
             }
         }).start();
     }
 
-    private void retrieveToken(final Context context, String tokenURL,
-                               TokenResponseListener listener) {
+    private void retrieveToken(AccessTokenListener listener) {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -84,15 +108,12 @@ class QuickstartChatManager {
             TokenResponse tokenResponse = gson.fromJson(responseBody,TokenResponse.class);
             String accessToken = tokenResponse.token;
             Log.d(MainActivity.TAG, "Retrieved access token from server: " + accessToken);
+            listener.receivedAccessToken(accessToken, null);
 
-            ChatClient.Properties.Builder builder = new ChatClient.Properties.Builder();
-            ChatClient.Properties props = builder.createProperties();
-            ChatClient.create(context, accessToken, props, mChatClientCallback);
-            listener.receivedTokenResponse(true,null);
         }
         catch (IOException ex) {
             Log.e(MainActivity.TAG, ex.getLocalizedMessage(),ex);
-            listener.receivedTokenResponse(true, ex);
+            listener.receivedAccessToken(null, ex);
         }
     }
 
@@ -273,7 +294,19 @@ class QuickstartChatManager {
 
                 @Override
                 public void onTokenAboutToExpire() {
-
+                    retrieveToken(new AccessTokenListener() {
+                        @Override
+                        public void receivedAccessToken(@Nullable String token, @Nullable Exception exception) {
+                            if (token != null) {
+                                chatClient.updateToken(token, new StatusListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d(MainActivity.TAG, "Refreshed access token.");
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             };
 
