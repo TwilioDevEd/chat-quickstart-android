@@ -178,6 +178,15 @@ class QuickstartChatManager {
 
     private void joinChannel(final Channel channel) {
         Log.d(MainActivity.TAG, "Joining Channel: " + channel.getUniqueName());
+        if (channel.getStatus() == Channel.ChannelStatus.JOINED) {
+
+            QuickstartChatManager.this.channel = channel;
+            Log.d(MainActivity.TAG, "Already joined default channel");
+            QuickstartChatManager.this.channel.addListener(mDefaultChannelListener);
+            return;
+        }
+
+
         channel.join(new StatusListener() {
             @Override
             public void onSuccess() {
@@ -314,7 +323,7 @@ class QuickstartChatManager {
             new CallbackListener<ChatClient>() {
                 @Override
                 public void onSuccess(ChatClient chatClient) {
-                    chatClient.setListener(QuickstartChatManager.this.mChatClientListener);
+                    chatClient.addListener(QuickstartChatManager.this.mChatClientListener);
                     QuickstartChatManager.this.chatClient = chatClient;
                     Log.d(MainActivity.TAG, "Success creating Twilio Chat Client");
                 }
