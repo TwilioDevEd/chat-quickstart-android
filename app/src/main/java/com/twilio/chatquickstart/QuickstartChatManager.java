@@ -132,6 +132,23 @@ class QuickstartChatManager {
         }
     }
 
+    private void createChannel() {
+        chatClient.getChannels().createChannel(DEFAULT_CHANNEL_NAME,
+                Channel.ChannelType.PRIVATE, new CallbackListener<Channel>() {
+                    @Override
+                    public void onSuccess(Channel channel) {
+                        if (channel != null) {
+                            Log.d(MainActivity.TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
+                            joinChannel(channel);
+                        }
+                    }
+
+                    @Override
+                    public void onError(ErrorInfo errorInfo) {
+                        Log.e(MainActivity.TAG, "Error creating channel: " + errorInfo.getMessage());
+                    }
+                });
+    }
 
     private void loadChannels() {
         chatClient.getChannels().getChannel(DEFAULT_CHANNEL_NAME, new CallbackListener<Channel>() {
@@ -150,26 +167,13 @@ class QuickstartChatManager {
                 } else {
                     Log.d(MainActivity.TAG, "Creating Channel: " + DEFAULT_CHANNEL_NAME);
 
-                    chatClient.getChannels().createChannel(DEFAULT_CHANNEL_NAME,
-                            Channel.ChannelType.PRIVATE, new CallbackListener<Channel>() {
-                                @Override
-                                public void onSuccess(Channel channel) {
-                                    if (channel != null) {
-                                        Log.d(MainActivity.TAG, "Joining Channel: " + DEFAULT_CHANNEL_NAME);
-                                        joinChannel(channel);
-                                    }
-                                }
-
-                                @Override
-                                public void onError(ErrorInfo errorInfo) {
-                                    Log.e(MainActivity.TAG, "Error creating channel: " + errorInfo.getMessage());
-                                }
-                            });
+                    createChannel();
                 }
             }
 
             @Override
             public void onError(ErrorInfo errorInfo) {
+                createChannel();
                 Log.e(MainActivity.TAG, "Error retrieving channel: " + errorInfo.getMessage());
             }
 
@@ -323,8 +327,8 @@ class QuickstartChatManager {
             new CallbackListener<ChatClient>() {
                 @Override
                 public void onSuccess(ChatClient chatClient) {
-                    chatClient.addListener(QuickstartChatManager.this.mChatClientListener);
                     QuickstartChatManager.this.chatClient = chatClient;
+                    chatClient.addListener(QuickstartChatManager.this.mChatClientListener);
                     Log.d(MainActivity.TAG, "Success creating Twilio Chat Client");
                 }
 
